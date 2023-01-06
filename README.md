@@ -25,6 +25,7 @@ In the final part of the project, you'll set up K3d and Argo CD in your environm
 a scalable and efficient Kubernetes environment.
 
 ## Objectives
+
 By completing this project, you'll have gained valuable experience in setting up and managing Kubernetes environments using a variety of tools and technologies. You'll be well-prepared to tackle real-world challenges in the field of containerization and orchestration.
 
 Please refer to the respective subdirectories for further instructions and guidelines for each part of the project. Good luck and happy learning!
