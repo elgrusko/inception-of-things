@@ -1,0 +1,41 @@
+# VIRTUALBOX SETTINGS
+MEMORY = 512 # or 1024
+CPU = 1
+# MACHINES SETTINGS
+S_NAME = "elgruskoS"
+S_IP = "192.168.56.110"
+SW_NAME = "elgruskoSW"
+SW_IP = "192.168.56.111"
+TOKEN_FILE = "/vagrant/token"
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = CPU
+    vb.memory = MEMORY
+  end
+
+  config.vm.box = "generic/debian10"
+  config.vm.box_url = "https://app.vagrantup.com/generic/boxes/debian10"
+  config.vm.provision "shell", path: "./scripts/debian.sh"
+
+  config.vm.define S_NAME do |s|
+    s.vm.hostname = S_NAME
+    s.vm.network "private_network", ip: S_IP
+    s.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--name", S_NAME]
+    end
+    s.vm.provision "shell", path: "./scripts/server.sh", args: [S_IP, TOKEN_FILE]
+    s.vm.synced_folder "./confs", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define SW_NAME do |sw|
+    sw.vm.hostname = SW_NAME
+    sw.vm.network "private_network", ip: SW_IP
+    sw.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--name", SW_NAME]
+    end
+    sw.vm.provision "shell", path: "./scripts/worker.sh", args: [S_IP, TOKEN_FILE, SW_IP]
+    sw.vm.synced_folder "./confs", "/vagrant", type: "virtualbox"
+  end
+
+end

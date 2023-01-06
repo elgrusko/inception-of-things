@@ -1,0 +1,12 @@
+--- 
+kind: Service
+apiVersion: v1
+metadata:
+  name: app-two-service
+spec:
+  selector:
+    app: app-two # refere le deployment sur lequel on veut creer le service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
