@@ -22,15 +22,31 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 echo "=== Install K3D ==="
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+sudo curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 echo "=== Create K3D cluster==="
-k3d cluster create mycluster
+sudo k3d cluster create mycluster -p 8080:80@loadbalancer --agents 2 --k3s-arg "--disable=traefik@server:0"
 
 echo "=== Create namespaces (argocd & dev)==="
-kubectl create namespace argocd
-kubectl create namespace dev
+sudo kubectl create namespace argocd
+sudo kubectl create namespace dev
 
 echo "=== Install ArgoCD ==="
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+sleep 30
+
+#better way but i didnt succeed : https://enix.io/fr/blog/kubernetes-tip-and-tricks-la-commande-wait/
+#sudo kubectl wait --for=condition=ready deployments -n argocd
+#sudo kubectl wait --for=condition=ready pods -n argocd
+
+echo "=== Config Access to Argo CD Server ==="
+sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+sudo sleep 10
+
+echo "USERNAME: admin (default)"
+echo "PASSWORD: $(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d;)"
+
+echo "=== Deploy manifest ==="
+sudo kubectl apply -f ../confs/manifest.yaml -n argocd # add absolute path
