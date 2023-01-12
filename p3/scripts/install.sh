@@ -49,4 +49,6 @@ echo "USERNAME: admin (default)"
 echo "PASSWORD: $(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d;)"
 
 echo "=== Deploy manifest ==="
-sudo kubectl apply -f ../confs/manifest.yaml -n argocd # add absolute path
+sudo kubectl apply -f manifest.yaml -n argocd
+sudo sleep 60
+sudo sh ./forward.sh
