@@ -1,4 +1,4 @@
-# Virtual Machine Configuration - P2
+# IoT - P2
 
 This configuration file uses Vagrant and VirtualBox to set up a single virtual machine: a server.
 
