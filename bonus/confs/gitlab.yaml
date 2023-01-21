@@ -1,31 +1,24 @@
-# Configure the external URL for GitLab
 global:
-  externalUrl: https://gitlab.example.com
+  externalUrl: http://localhost
+  # ingress:
+  #   annotations:
+  #     cert-manager.io/cluster-issuer: letsencrypt-prod
+  #   tls:
+  #     - secretName: gitlab-tls
+  #       hosts:
+  #         - gitlab.example.com
 
-# Configure the resources for the GitLab pods
-resources:
-  requests:
-    memory: 2Gi
-    cpu: 2
-  limits:
-    memory: 4Gi
-    cpu: 4
-
-# Enable the Prometheus and Grafana charts
-prometheus:
-  enabled: true
-grafana:
-  enabled: true
-
-# Configure the PostgreSQL chart
 postgresql:
   postgresqlUsername: gitlab
   postgresqlPassword: gitlabpassword
   postgresqlDatabase: gitlabhq_production
 
-# Enable the Runner chart
-runner:
-  enabled: true
+redis:
+  password: redispassword
+
+gitlab-runner:
+  install: true
+  gitlabRunnerRegistrationToken: "token"
   resources:
     requests:
       memory: 1Gi
@@ -33,3 +26,10 @@ runner:
     limits:
       memory: 2Gi
       cpu: 2
+
+# certmanager:
+#   install: true
+#   email: admin@example.com
+
+service:
+  type: ClusterIP

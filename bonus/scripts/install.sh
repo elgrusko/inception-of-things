@@ -24,7 +24,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 echo "=== Install K3D ==="
 sudo curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
-echo "=== Install HELM ==="
+echo "=== Install Helm ==="
 sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 echo "=== Create K3D cluster==="
@@ -37,7 +37,7 @@ sudo kubectl create namespace gitlab
 
 echo "=== Install GitLab ==="
 helm repo add gitlab https://charts.gitlab.io/
-helm install gitlab gitlab/gitlab -f ../confs/gitlab.yaml -n gitlab
+helm install gitlab gitlab/gitlab -f ../confs/gitlab.yaml --namespace gitlab
 
 echo "=== Install ArgoCD ==="
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
