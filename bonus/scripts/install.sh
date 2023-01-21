@@ -24,12 +24,20 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 echo "=== Install K3D ==="
 sudo curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
+echo "=== Install HELM ==="
+sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 echo "=== Create K3D cluster==="
 sudo k3d cluster create mycluster -p 8080:80@loadbalancer --agents 2 --k3s-arg "--disable=traefik@server:0"
 
 echo "=== Create namespaces (argocd & dev)==="
 sudo kubectl create namespace argocd
 sudo kubectl create namespace dev
+sudo kubectl create namespace gitlab
+
+echo "=== Install GitLab ==="
+helm repo add gitlab https://charts.gitlab.io/
+helm install gitlab gitlab/gitlab -f ../confs/gitlab.yaml -n gitlab
 
 echo "=== Install ArgoCD ==="
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
@@ -49,6 +57,6 @@ echo "USERNAME: admin (default)"
 echo "PASSWORD: $(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d;)"
 
 echo "=== Deploy manifest ==="
-sudo kubectl apply -f manifest.yaml -n argocd
+sudo kubectl apply -f ../confs/manifest.yaml -n argocd
 sudo sleep 60
 sudo sh ./forward.sh
