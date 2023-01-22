@@ -5,7 +5,7 @@
 #  https://yashguptaa.medium.com/application-deploy-to-kubernetes-with-argo-cd-and-k3d-8e29cf4f83ee
 
 sudo apt-get update -y
-sudo apt-get ugrade -y
+sudo apt-get upgrade -y
 
 echo "===Removing potential already installed docker versions (like in official doc advices) ==="
 sudo apt-get remove docker docker-engine docker.io containerd runc -y
