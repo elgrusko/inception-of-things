@@ -1,0 +1,38 @@
+# Configure a Vagrant virtual machine (VM) using version 2 of the Vagrant configuration
+Vagrant.configure("2") do |config|
+  
+  # Set the box for the VM to "centos/stream8" and specify the box URL
+  config.vm.box = "centos/stream8"
+  config.vm.box_url = "https://app.vagrantup.com/centos/boxes/stream8/versions/20210210.0/providers/virtualbox.box"
+  
+  # Allow kernel upgrades when using the vbguest plugin
+  config.vbguest.installer_options = { allow_kernel_upgrade: true }
+  
+  # Define a VM named "gitlabvm" with the following settings
+  config.vm.define "gitlabvm" do |vm_config|
+
+    # Forward network port 8181 from the guest to the host using TCP protocol
+    vm_config.vm.network "forwarded_port", guest: 8181, host: 8181, protocol: "tcp"
+    
+    # Set the hostname of the VM to "gitlabvm"
+    vm_config.vm.hostname = "gitlabvm"
+    
+    # Create a private network with IP address "192.168.56.142" and set the hostname to the VM's hostname
+    vm_config.vm.network "private_network", ip: "192.168.56.142", hostname: true
+    
+    # Sync the current directory on the host machine with "/vagrant" on the guest VM and allow symlinks to be created
+    vm_config.vm.synced_folder ".", "/vagrant", type: "virtualbox", SharedFoldersEnableSymlinksCreate: true
+    
+    # Configure the provider for the VM to be VirtualBox and make the following customizations
+    vm_config.vm.provider "virtualbox" do |vb|
+      vb.name = "gitlabvm" # Set the name of the VM to "gitlabvm"
+      vb.cpus = 4 # Set the number of CPU cores to 4
+      vb.memory = 4096 # Set the memory to 4096
+      vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"] # Enable NAT DNS proxy
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"] # Enable NAT DNS host resolver
+    end
+    
+    # Run a provisioning script "scripts/install.sh" with privilege, passing the argument "192.168.56.142"
+    vm_config.vm.provision "shell", path: "scripts/install.sh", privileged: true, args: "192.168.56.142"
+  end
+end

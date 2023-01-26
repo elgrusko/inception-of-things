@@ -7,7 +7,7 @@
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
-echo "===Removing potential already installed docker versions (like in official doc advices) ==="
+echo "=== Removing potential already installed docker versions (like in official doc advices) ==="
 sudo apt-get remove docker docker-engine docker.io containerd runc -y
 
 echo "=== Install useful tools ==="
@@ -27,6 +27,10 @@ sudo curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 echo "=== Create K3D cluster==="
 sudo k3d cluster create mycluster -p 8080:80@loadbalancer --agents 2 --k3s-arg "--disable=traefik@server:0"
 
+echo "=== Cleaning namespaces ==="
+kubectl delete namespace argocd
+kubectl delete namespace dev
+
 echo "=== Create namespaces (argocd & dev)==="
 sudo kubectl create namespace argocd
 sudo kubectl create namespace dev
@@ -35,10 +39,6 @@ echo "=== Install ArgoCD ==="
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 sleep 30
-
-#better way but i didnt succeed : https://enix.io/fr/blog/kubernetes-tip-and-tricks-la-commande-wait/
-#sudo kubectl wait --for=condition=ready deployments -n argocd
-#sudo kubectl wait --for=condition=ready pods -n argocd
 
 echo "=== Config Access to Argo CD Server ==="
 sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
@@ -49,6 +49,6 @@ echo "USERNAME: admin (default)"
 echo "PASSWORD: $(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d;)"
 
 echo "=== Deploy manifest ==="
-sudo kubectl apply -f manifest.yaml -n argocd
+sudo kubectl apply -f ../confs/manifest.yaml -n argocd
 sudo sleep 60
 sudo sh ./forward.sh

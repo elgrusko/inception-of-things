@@ -1,0 +1,11 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: wil-gitlab
+  namespace: argocd
+spec:
+  sourceRepos:
+  - "http://192.168.56.142:8181/root/*"
+  destinations:
+  - namespace: gitlab
+    server: https://kubernetes.default.svc
